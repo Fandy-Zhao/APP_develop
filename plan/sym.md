@@ -1,37 +1,41 @@
-太好了！基于 PyQt6 框架，我为你设计一个**完整、结构化、从 0 开始**的学习框架。这个框架分为 4 个阶段，每个阶段都有明确的目标和实践项目。
-
----
+# PyQt6 桌面应用开发：从零开始完整学习框架
 
 ## 🎯 总体学习路线图
 
-**阶段 1：基础准备** → **阶段 2：核心掌握** → **阶段 3：项目实战** → **阶段 4：高级进阶**
-
----
+遵循 **"基础准备 → 核心掌握 → 项目实战 → 高级进阶"** 的循序渐进路径。
 
 ## 📚 阶段 1：基础准备（1-2周）
 
 ### 1.1 Python 基础巩固
-**目标**：掌握 PyQt6 开发必需的 Python 知识
-- [ ] 变量、数据类型、运算符
-- [ ] 流程控制（if-else, for, while）
-- [ ] 函数定义和使用
-- [ ] **面向对象编程（重点！）**
-  - 类和对象
-  - 继承和多态
+
+**目标**：掌握 PyQt6 开发必需的 Python 知识。
+
+- [ ] **变量、数据类型、运算符
+- [ ] **流程控制**（if-else, for, while）
+- [ ] **函数定义和使用**
+- [ ] **面向对象编程（重点！）**  
+  - 类和对象  
+  - 继承和多态 
   - 方法和属性
 
 ### 1.2 开发环境搭建
-**工具**：
+
+**必备工具**：
+
 - **Python 3.8+**：从官网安装
-- **VS Code**：轻量级代码编辑器
-  - 安装 Python 和 Pylance 扩展
-- **PyQt6 安装**：
-  ```bash
-  pip install pyqt6
-  pip install pyqt6-tools
-  ```
+
+- **VS Code**：轻量级代码编辑器  - 安装 Python 和 Pylance 扩展
+- **PyQt6 安装**：  
+
+```bash
+pip install pyqt6  
+pip install pyqt6-tools
+```
 
 ### 1.3 第一个 PyQt6 程序
+
+创建 `first_app.py`：
+
 ```python
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget
@@ -49,13 +53,17 @@ window.show()
 sys.exit(app.exec())
 ```
 
----
+运行命令：
+```bash
+python first_app.py
+```
 
 ## 🏗️ 阶段 2：核心组件掌握（3-4周）
 
 ### 2.1 基础窗口组件
+
 **学习顺序**：
-1. **QMainWindow**：主窗口类
+1. **QMainWindow**：主窗口类（包含菜单栏、状态栏等）
 2. **QDialog**：对话框类
 3. **布局管理器**：
    - `QVBoxLayout`：垂直布局
@@ -63,7 +71,9 @@ sys.exit(app.exec())
    - `QGridLayout`：网格布局
 
 ### 2.2 常用控件学习
-按此顺序学习：
+
+按此顺序学习控件：
+
 ```python
 # 基础输入控件
 QPushButton, QLabel, QLineEdit, QTextEdit
@@ -75,15 +85,28 @@ QProgressBar, QSlider, QSpinBox
 ```
 
 ### 2.3 信号与槽机制（核心！）
+
 **重点掌握**：
+
 ```python
 # 内置信号连接
-button.clicked.connect(self.on_button_click)
-line_edit.textChanged.connect(self.on_text_changed)
-
-# 自定义信号
+from PyQt6.QtWidgets import QPushButton, QWidget
 from PyQt6.QtCore import pyqtSignal
 
+class MyWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setup_ui()
+    
+    def setup_ui(self):
+        button = QPushButton("点击我", self)
+        # 连接信号与槽
+        button.clicked.connect(self.on_button_click)
+    
+    def on_button_click(self):
+        print("按钮被点击了！")
+
+# 自定义信号
 class MyWidget(QWidget):
     # 定义自定义信号
     custom_signal = pyqtSignal(str)
@@ -93,16 +116,19 @@ class MyWidget(QWidget):
 ```
 
 ### 阶段 2 实战项目：**个人信息收集器**
+
+**功能要求**：
 - 包含姓名、年龄、性别、爱好等输入项
 - 使用多种布局组合
 - 实现数据验证和提交功能
-
----
+- 点击提交后在控制台显示收集的信息
 
 ## 🎨 阶段 3：界面美化与数据持久化（2-3周）
 
 ### 3.1 界面美化 - QSS
+
 **学习 Qt Style Sheets**（类似 CSS）：
+
 ```python
 # 设置样式
 window.setStyleSheet("""
@@ -114,130 +140,376 @@ window.setStyleSheet("""
         color: white;
         border-radius: 5px;
         padding: 8px 15px;
+        font-size: 14px;
     }
     QPushButton:hover {
         background-color: #005a9e;
+    }
+    QPushButton:pressed {
+        background-color: #003d6b;
+    }
+    QLineEdit {
+        border: 2px solid #cccccc;
+        border-radius: 4px;
+        padding: 5px;
+        font-size: 14px;
+    }
+    QLineEdit:focus {
+        border-color: #007acc;
     }
 """)
 ```
 
 ### 3.2 数据持久化 - SQLite
+
 ```python
 import sqlite3
+from datetime import datetime
 
-# 连接数据库
-conn = sqlite3.connect('myapp.db')
-cursor = conn.cursor()
-
-# 创建表
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY,
-        name TEXT NOT NULL,
-        email TEXT UNIQUE
-    )
-''')
-conn.commit()
+class DatabaseManager:
+    def __init__(self, db_name='myapp.db'):
+        self.conn = sqlite3.connect(db_name)
+        self.create_tables()
+    
+    def create_tables(self):
+        cursor = self.conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                age INTEGER,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        self.conn.commit()
+    
+    def add_user(self, name, email, age):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute('''
+                INSERT INTO users (name, email, age)
+                VALUES (?, ?, ?)
+            ''', (name, email, age))
+            self.conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False
+    
+    def get_all_users(self):
+        cursor = self.conn.cursor()
+        cursor.execute('SELECT * FROM users')
+        return cursor.fetchall()
 ```
 
 ### 3.3 文件操作
-```python
-from PyQt6.QtWidgets import QFileDialog
 
-# 文件选择对话框
-file_path, _ = QFileDialog.getOpenFileName(
-    self, "选择文件", "", "All Files (*)"
-)
+```python
+from PyQt6.QtWidgets import QFileDialog, QMessageBox
+
+class FileManager:
+    def __init__(self, parent_window):
+        self.parent = parent_window
+    
+    def open_file_dialog(self):
+        file_path, _ = QFileDialog.getOpenFileName(
+            self.parent, 
+            "选择文件", 
+            "", 
+            "文本文件 (*.txt);;所有文件 (*)"
+        )
+        if file_path:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    content = file.read()
+                return content
+            except Exception as e:
+                QMessageBox.warning(self.parent, "错误", f"无法打开文件: {str(e)}")
+        return None
+    
+    def save_file_dialog(self, content):
+        file_path, _ = QFileDialog.getSaveFileName(
+            self.parent,
+            "保存文件",
+            "",
+            "文本文件 (*.txt);;所有文件 (*)"
+        )
+        if file_path:
+            try:
+                with open(file_path, 'w', encoding='utf-8') as file:
+                    file.write(content)
+                QMessageBox.information(self.parent, "成功", "文件保存成功！")
+                return True
+            except Exception as e:
+                QMessageBox.warning(self.parent, "错误", f"无法保存文件: {str(e)}")
+        return False
 ```
 
 ### 阶段 3 实战项目：**简易笔记本**
-- 富文本编辑功能
-- 笔记列表展示
-- 数据保存到 SQLite
-- 自定义美观的界面
 
----
+**功能要求**：
+- 富文本编辑功能（QTextEdit）
+- 笔记列表展示（QListWidget）
+- 数据保存到 SQLite 数据库
+- 自定义美观的界面样式
+- 支持笔记的创建、编辑、删除和搜索
 
 ## 🚀 阶段 4：高级特性与项目实战（3-4周）
 
 ### 4.1 多线程编程
+
 **防止界面卡顿**：
+
 ```python
 from PyQt6.QtCore import QThread, pyqtSignal
+import time
 
 class WorkerThread(QThread):
     progress_updated = pyqtSignal(int)
-    finished = pyqtSignal()
+    finished = pyqtSignal(str)
+    error_occurred = pyqtSignal(str)
+    
+    def __init__(self, task_data):
+        super().__init__()
+        self.task_data = task_data
+        self.is_running = True
     
     def run(self):
-        # 执行耗时操作
-        for i in range(100):
-            self.progress_updated.emit(i)
-            self.msleep(50)
-        self.finished.emit()
+        try:
+            for i in range(101):
+                if not self.is_running:
+                    break
+                # 模拟耗时操作
+                time.sleep(0.1)
+                self.progress_updated.emit(i)
+            
+            if self.is_running:
+                self.finished.emit("任务完成！")
+        except Exception as e:
+            self.error_occurred.emit(str(e))
+    
+    def stop(self):
+        self.is_running = False
+
+# 在主窗口中使用
+class MainWindow(QMainWindow):
+    def start_long_task(self):
+        self.worker = WorkerThread("一些数据")
+        self.worker.progress_updated.connect(self.update_progress)
+        self.worker.finished.connect(self.task_finished)
+        self.worker.error_occurred.connect(self.task_error)
+        self.worker.start()
+    
+    def update_progress(self, value):
+        self.progress_bar.setValue(value)
 ```
 
 ### 4.2 自定义控件
+
 ```python
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PyQt6.QtCore import Qt, pyqtSignal
+
 class CustomButton(QPushButton):
-    def __init__(self, text):
+    """自定义按钮控件"""
+    def __init__(self, text, icon_path=None):
         super().__init__(text)
-        self.setup_ui()
+        self.setup_ui(icon_path)
     
-    def setup_ui(self):
+    def setup_ui(self, icon_path):
+        self.setMinimumSize(120, 40)
         self.setStyleSheet("""
-            /* 自定义样式 */
+            CustomButton {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            CustomButton:hover {
+                background-color: #45a049;
+            }
+            CustomButton:pressed {
+                background-color: #3d8b40;
+            }
+        """)
+
+class TaskWidget(QWidget):
+    """任务项自定义控件"""
+    task_deleted = pyqtSignal(int)
+    task_completed = pyqtSignal(int, bool)
+    
+    def __init__(self, task_id, title, description):
+        super().__init__()
+        self.task_id = task_id
+        self.setup_ui(title, description)
+    
+    def setup_ui(self, title, description):
+        layout = QVBoxLayout()
+        
+        title_label = QLabel(title)
+        title_label.setStyleSheet("font-weight: bold; font-size: 14px;")
+        
+        desc_label = QLabel(description)
+        desc_label.setStyleSheet("color: #666; font-size: 12px;")
+        
+        layout.addWidget(title_label)
+        layout.addWidget(desc_label)
+        self.setLayout(layout)
+        
+        self.setStyleSheet("""
+            TaskWidget {
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                padding: 10px;
+                background-color: white;
+            }
+            TaskWidget:hover {
+                border-color: #007acc;
+            }
         """)
 ```
 
 ### 4.3 打包分发
-使用 PyInstaller：
+
+使用 PyInstaller 打包应用：
+
 ```bash
-# 打包为单个可执行文件
+# 基础打包
 pyinstaller --onefile --windowed your_app.py
 
-# 添加图标
+# 带图标的打包
 pyinstaller --onefile --windowed --icon=app.ico your_app.py
+
+# 添加额外文件的打包
+pyinstaller --onefile --windowed --add-data "data;data" your_app.py
+
+# 隐藏命令行窗口（仅 Windows）
+pyinstaller --onefile --noconsole your_app.py
+```
+
+创建打包配置文件 `build.spec`：
+
+```python
+# -*- mode: python ; coding: utf-8 -*-
+
+block_cipher = None
+
+a = Analysis(
+    ['your_app.py'],
+    pathex=[],
+    binaries=[],
+    datas=[('images', 'images'), ('data', 'data')],
+    hiddenimports=[],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name='MyApp',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon='app.ico',
+)
 ```
 
 ### 阶段 4 终极项目：**个人任务管理系统**
-- 任务增删改查
-- 分类和优先级
-- 数据统计图表
-- 定时提醒功能
-- 可打包分发
 
----
+**完整功能要求**：
+
+1. **核心功能**：
+   - 任务的增删改查
+   - 任务分类和优先级设置
+   - 截止日期提醒
+
+2. **高级功能**：
+   - 数据统计图表（使用 QChart）
+   - 定时提醒功能（系统通知）
+   - 数据导入导出（JSON、CSV）
+   - 多主题切换
+
+3. **技术特性**：
+   - 使用 SQLite 数据库
+   - 多线程处理耗时操作
+   - 自定义控件和样式
+   - 可打包为独立执行文件
 
 ## 🛠️ 学习资源推荐
 
-### 官方资源
+### 官方文档
 - **PyQt6 官方文档**：https://www.riverbankcomputing.com/static/Docs/PyQt6/
 - **Qt 官方文档**：https://doc.qt.io/qt-6/index.html
 
+### 推荐书籍
+- 《PyQt6 快速开发与实战》
+- 《Rapid GUI Programming with Python and Qt》
+
 ### 实践建议
-1. **每日编码**：哪怕只有 30 分钟
-2. **边学边做**：每个知识点都写代码验证
-3. **模仿改造**：先模仿现有程序，再添加自己的功能
-4. **善用搜索引擎**：错误信息 + "PyQt6" 通常能找到解决方案
 
-### 常见问题解决路径
-```
-遇到问题 → 查看官方文档 → 搜索 Stack Overflow → 
-查看 GitHub 类似项目 → 提问求助
-```
+1. **每日编码**：保持连续学习，哪怕每天30分钟
+2. **项目驱动**：每个阶段都要完成对应的实战项目
+3. **循序渐进**：不要跳跃学习，打好基础很重要
+4. **善用搜索**：遇到问题先搜索，大部分问题都有解决方案
 
----
+## 📅 学习时间规划表
 
-## 🎯 学习时间规划
+| 阶段      | 持续时间 | 每周计划     | 目标产出                 |
+| --------- | -------- | ------------ | ------------------------ |
+| **阶段1** | 1-2周    | 10-15小时/周 | 能创建基础窗口和应用     |
+| **阶段2** | 3-4周    | 12-18小时/周 | 能制作完整的表单应用     |
+| **阶段3** | 2-3周    | 10-15小时/周 | 能制作有数据库的美观应用 |
+| **阶段4** | 3-4周    | 15-20小时/周 | 能制作复杂应用并打包分发 |
 
-| 阶段   | 持续时间 | 目标产出                 |
-| ------ | -------- | ------------------------ |
-| 阶段 1 | 1-2周    | 能创建基础窗口           |
-| 阶段 2 | 3-4周    | 能制作完整表单应用       |
-| 阶段 3 | 2-3周    | 能制作有数据库的美观应用 |
-| 阶段 4 | 3-4周    | 能制作复杂桌面应用并打包 |
+## 🔧 故障排除指南
 
-这个框架从最基础的安装开始，循序渐进地引导你掌握 PyQt6 开发的各个方面。每个阶段都有明确的目标和实战项目，确保你能够真正掌握知识并应用到实际开发中。
+### 常见问题及解决方案
 
-**现在就可以开始阶段 1 的学习了！祝你学习顺利！**
+1. **导入错误**：
+   ```python
+   # 错误：ModuleNotFoundError: No module named 'PyQt6'
+   # 解决：重新安装 PyQt6
+   pip uninstall pyqt6
+   pip install pyqt6
+   ```
+
+2. **界面卡顿**：
+   - 使用多线程处理耗时操作
+   - 避免在主线程中进行大量计算
+
+3. **打包问题**：
+   - 确保所有资源文件路径正确
+   - 使用 `os.path.join` 处理路径
+
+## 🎯 下一步行动
+
+1. **立即开始**：安装 Python 和 PyQt6
+2. **创建第一个程序**：运行阶段1的示例代码
+3. **制定计划**：根据自身情况调整学习时间表
+4. **加入社区**：关注相关技术论坛和社群
+
+**记住：最好的学习方式是动手实践！从现在开始编写代码吧！**
