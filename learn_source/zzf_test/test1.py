@@ -1,20 +1,9 @@
-# from PyQt6.QtCore import QDate, QTime, QDateTime, Qt
-
-# now = QDate.currentDate()
-
-# print(now.toString(Qt.DateFormat.ISODate))
-# print(now.toString(Qt.DateFormat.RFC2822Date))
-
-# datetime = QDateTime.currentDateTime()
-
-# print(datetime.toString())
-
-# time = QTime.currentTime()
-# print(time.toString(Qt.DateFormat.ISODate))
+#本代码事例，包含菜单，工具栏，布局管理的实现
 
 import sys
 from PyQt6.QtWidgets import QWidget, QToolTip,QPushButton, QMessageBox, QMenu, QApplication
 from PyQt6.QtWidgets import QMainWindow #状态栏
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout#布局管理
 from PyQt6.QtGui import QFont, QIcon, QAction
 
 
@@ -38,6 +27,10 @@ class Example(QMainWindow):
         self.statusBar().showMessage('Ready')                   #状态栏
 
         self.menu_create()                                      #菜单创建
+
+        #self.layout()                                           #布局管理
+        self.grid_layout()                                      #网格布局管理 
+
 
         screen = QApplication.primaryScreen().geometry()        #窗口移至屏幕中央
         x = (screen.width() - 500) // 2
@@ -112,6 +105,50 @@ class Example(QMainWindow):
             self.statusBar().setVisible(True)
         else:
             self.statusBar().setVisible(False)
+
+    #布局管理,右下角添加两个会随窗口大小变化位置的按钮
+    #在 QMainWindow 中，如果你想使用自定义布局（比如 QVBoxLayout），要把它放在一个普通的 QWidget 中，然后再把这个 QWidget 设置为中央部件
+    def layout(self):
+        okButton = QPushButton("OK")
+        cancelButton = QPushButton("Cancel")
+
+        hbox = QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addWidget(okButton)
+        hbox.addWidget(cancelButton)
+
+        vbox = QVBoxLayout()
+        vbox.addStretch(1)
+        vbox.addLayout(hbox)
+
+        central_widget = QWidget()
+        central_widget.setLayout(vbox)
+
+        self.setCentralWidget(central_widget)
+
+    #创建管理多行多列的布局
+    def grid_layout(self):
+        grid = QGridLayout()
+        grid.setSpacing(10)
+
+        names = ['','','','',
+                 '7', '8', '9', '/',
+                 '4', '5', '6', '*',
+                 '1', '2', '3', '-',
+                 '0', '.', '=', '+']
+
+        positions = [(i,j) for i in range(4) for j in range(4)]
+
+        for position, name in zip(positions, names):
+            if name == '':
+                continue
+            button = QPushButton(name)
+            grid.addWidget(button, *position)
+
+        central_widget = QWidget()
+        central_widget.setLayout(grid)
+
+        self.setCentralWidget(central_widget)
 
 def main():
 
